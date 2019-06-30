@@ -7,6 +7,8 @@
 
 #include "jni_resource_reader.h"
 
+#include "NativeRenderer.h"
+
 extern "C"
 {
 // main activity methods
@@ -27,37 +29,26 @@ MAIN_ACTIVITY_METHOD(void, initAssetManager)
 
 // renderer methods
 //    -----------------------------------
+
+std::unique_ptr<NativeRenderer> g_renderer;
 #define NATIVE_RENDERER_METHOD(Type, funcName) \
 JNIEXPORT Type JNICALL \
 Java_com_example_myfirstgame_NativeRenderer_##funcName
 
 NATIVE_RENDERER_METHOD(void, init)
 (JNIEnv *, jobject) {
+    g_renderer = std::make_unique<NativeRenderer>();
 }
 
 NATIVE_RENDERER_METHOD(void, resize)
 (JNIEnv *, jobject,
  jint width, jint height) {
+    g_renderer->changed(width, height);
 }
 
 NATIVE_RENDERER_METHOD(void, render)
 (JNIEnv *, jobject) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    static float color = 0;
-    static bool direction = true;
-    static float step = 0.01f;
-
-    if (direction)
-        color += step;
-    else
-        color -= step;
-
-    if (color > 1)
-        direction = false;
-    else if (color < 0)
-        direction = true;
-
-    glClearColor(color, color, color, 1.0F);
+    g_renderer->render();
 }
 
 }

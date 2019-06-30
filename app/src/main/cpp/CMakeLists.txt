@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.4.1)
 add_library(
         native-lib
         SHARED
-        native-lib.cpp)
+        native-lib.cpp
+        NativeRenderer.cpp)
 
 target_include_directories(
         native-lib
