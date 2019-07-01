@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <GLES3/gl3.h>
 
+#include "logger.h"
+
 namespace engine_utils {
     static bool BuildShader(std::string const &shader_source, GLuint &shader, GLenum type) {
         int size = static_cast<int>(shader_source.length());

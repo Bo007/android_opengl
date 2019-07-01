@@ -5,6 +5,7 @@ add_library(
         SHARED
         native-lib.cpp
         engine/src/native_renderer.cpp
+        engine/src/cube_renderer.cpp
 )
 
 target_include_directories(

@@ -7,12 +7,24 @@
 
 class CubeRenderer {
 public:
-    CubeRenderer() = default;
+    CubeRenderer();
 
-    ~CubeRenderer() = default;
+    ~CubeRenderer();
 
-    void render() = default;
+    void render();
+
+    void setMvpMatrix(const glm::mat4 &mvpMatrix);
 
 private:
+
+    GLuint m_programID;
+
+    GLint m_posititonCoordinateHandle;
+    GLint m_mvpHandle;
+
+    static const std::vector<GLfloat> verticlesData;
+    static const std::vector<GLushort> indices;
+
+    glm::mat4 m_mvpMatrix;
 };
 

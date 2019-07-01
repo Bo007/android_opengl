@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <GLES3/gl3.h>
 
+#include "engine/include/cube_renderer.h"
+
 class NativeRenderer {
 public:
     NativeRenderer();
@@ -16,17 +18,14 @@ public:
     void render();
 
 private:
-    glm::mat4x4 getMvpMatrix() const;
+    glm::mat4x4 getMvpMatrix(float angle) const;
 private:
-    GLuint m_programID;
 
-    GLint m_posititonCoordinateHandle;
-    GLint m_mvpHandle;
+    const static glm::vec3 CLEAR_COLOR;
+
+    std::unique_ptr<CubeRenderer> m_cubeRenderer;
 
     int m_screenWidth;
     int m_screenHeight;
-
-    static const std::vector<GLfloat> verticlesData;
-    static const std::vector<GLushort> indices;
 };
 
