@@ -67,7 +67,7 @@ namespace engine_utils {
         return true;
     }
 
-    void CheckGLError(const char *label) {
+    static void CheckGLError(const char *label) {
         int gl_error = glGetError();
         if (gl_error != GL_NO_ERROR) {
             LOGE("GL error @ %s: %d", label, gl_error);

@@ -6,6 +6,7 @@ add_library(
         native-lib.cpp
         engine/src/native_renderer.cpp
         engine/src/cube_renderer.cpp
+        engine/src/flat_renderer.cpp
 )
 
 target_include_directories(

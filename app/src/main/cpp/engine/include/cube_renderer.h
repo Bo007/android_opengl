@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <GLES3/gl3.h>
 
+#include "flat_renderer.h"
+
 class CubeRenderer {
 public:
     CubeRenderer();
@@ -13,20 +15,18 @@ public:
 
     void render();
 
-    void setMvpMatrix(const glm::mat4 &mvpMatrix);
+    void rotate(const glm::vec3 &rotationVec);
+
+    void setAspect(float aspect);
 
 private:
+    glm::mat4 getMvpMatrix(float angle) const;
 
-    GLuint m_programID;
+    static float getAngleFromTime();
 
-    GLint m_posititonCoordinateHandle;
-    GLint m_mvpHandle;
-    GLint m_colorHandle;
+private:
+    std::unique_ptr<FlatRenderer> m_flatRenderer;
 
-    static const std::vector<GLfloat> verticlesDatas[];
-    static const glm::vec3 flatColors[];
-    static const std::vector<GLushort> indices;
-
-    glm::mat4 m_mvpMatrix;
+    float m_aspect;
 };
 

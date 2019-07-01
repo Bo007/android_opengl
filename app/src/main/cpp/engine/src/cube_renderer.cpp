@@ -1,149 +1,56 @@
 #include "engine/include/cube_renderer.h"
 
+#include <chrono>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "engine/include/engine_utils.h"
-
-const std::vector<GLfloat> CubeRenderer::verticlesDatas[] =
-        {
-                {
-                        1.0F, 0.0F, 1.0F,
-                        1.0F, 0.0F, 0.0F,
-                        1.0F, 1.0F, 1.0F,
-                        1.0F, 1.0F, 0.0F,
-                },
-
-                {
-                        0.0F, 0.0F, 1.0F,
-                        0.0F, 0.0F, 0.0F,
-                        0.0F, 1.0F, 1.0F,
-                        0.0F, 1.0F, 0.0F,
-                },
-
-                {
-                        1.0F, 0.0F, 0.0F,
-                        1.0F, 0.0F, 1.0F,
-                        0.0F, 0.0F, 0.0F,
-                        0.0F, 0.0F, 1.0F,
-                },
-
-                {
-                        1.0F, 1.0F, 0.0F,
-                        1.0F, 1.0F, 1.0F,
-                        0.0F, 1.0F, 0.0F,
-                        0.0F, 1.0F, 1.0F,
-                },
-
-                {
-                        0.0F, 1.0F, 0.0F,
-                        0.0F, 0.0F, 0.0F,
-                        1.0F, 1.0F, 0.0F,
-                        1.0F, 0.0F, 0.0F,
-                },
-
-                {
-                        0.0F, 1.0F, 1.0F,
-                        0.0F, 0.0F, 1.0F,
-                        1.0F, 1.0F, 1.0F,
-                        1.0F, 0.0F, 1.0F,
-                },
-        };
-
-
-const glm::vec3 CubeRenderer::flatColors[] = {
-        glm::vec3(1, 0, 0),
-        glm::vec3(0, 1, 0),
-
-        glm::vec3(0, 0, 1),
-        glm::vec3(1, 1, 0),
-
-        glm::vec3(0, 1, 1),
-        glm::vec3(1, 1, 1)
-};
-
-const std::vector<GLushort> CubeRenderer::indices = {
-        0, 1, 2, 2, 1, 3
-};
-
-static const GLchar *VERTEX_SHADER = R"glsl(
-precision mediump float;
-
-attribute vec3 aPosition;
-
-uniform mat4 uMvp;
-
-void main(void)
-{
-    gl_Position = uMvp * vec4( aPosition, 1.0 );
-}
-
-)glsl";
-
-static const GLchar *FRAGMENT_SHADER = R"glsl(
-precision mediump float;
-
-uniform vec3 uColor;
-
-void main(void)
-{
-    gl_FragColor = vec4( uColor, 1.0 );
-}
-
-)glsl";
-
 CubeRenderer::CubeRenderer() {
-    bool res = engine_utils::BuildProgram(VERTEX_SHADER, FRAGMENT_SHADER, m_programID);
-    assert(res);
-
-    m_posititonCoordinateHandle = glGetAttribLocation(m_programID, "aPosition");
-
-    m_mvpHandle = glGetUniformLocation(m_programID, "uMvp");
-
-    m_colorHandle = glGetUniformLocation(m_programID, "uColor");
-
-    m_mvpMatrix = glm::mat4x4(1);
+    m_flatRenderer = std::make_unique<FlatRenderer>();
+    m_aspect = 1.0;
 }
 
 CubeRenderer::~CubeRenderer() {
-    glDeleteProgram(m_programID);
+    m_flatRenderer.reset();
 }
 
 void CubeRenderer::render() {
-    glUseProgram(m_programID);
+    float angle = getAngleFromTime();
+//    auto angle = static_cast<float>(M_PI / 180 * 45);
+    auto mvp = getMvpMatrix(angle);
 
-    if (-1 != m_mvpHandle) {
-        glUniformMatrix4fv(m_mvpHandle, 1, GL_FALSE, glm::value_ptr(m_mvpMatrix));
-    }
-
-    for (int i = 0; i < 6; ++i) {
-        if (-1 != m_posititonCoordinateHandle) {
-
-            glVertexAttribPointer(m_posititonCoordinateHandle,
-                                  3,
-                                  GL_FLOAT,
-                                  GL_FALSE,
-                                  0,
-                                  CubeRenderer::verticlesDatas[i].data());
-
-            glEnableVertexAttribArray(m_posititonCoordinateHandle);
-        }
-
-        if (-1 != m_colorHandle) {
-            auto color = CubeRenderer::flatColors[i];
-            glUniform3fv(m_colorHandle, 1, glm::value_ptr(color));
-        }
-
-        glDrawElements(GL_TRIANGLES, CubeRenderer::indices.size(), GL_UNSIGNED_SHORT, CubeRenderer::indices.data());
-
-        if (m_posititonCoordinateHandle != -1)
-            glDisableVertexAttribArray(m_posititonCoordinateHandle);
-
-        engine_utils::CheckGLError("CubeRenderer::render");
-    }
+    m_flatRenderer->setMvpMatrix(mvp);
+    m_flatRenderer->render();
 }
 
-void CubeRenderer::setMvpMatrix(const glm::mat4 &mvpMatrix) {
-    m_mvpMatrix = mvpMatrix;
+glm::mat4 CubeRenderer::getMvpMatrix(float angle) const {
+    glm::mat4 anim = glm::rotate(glm::mat4(1.0F), angle, glm::vec3(1, 1, 1));
+
+    glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0F, 0.0), glm::vec3(0.0, 0.0, -4.0F), glm::vec3(0.0, 1.0, 0.0));
+
+    glm::mat4 model = glm::translate(glm::mat4(1.0F), glm::vec3(0.0, 0.0, -4.0F));
+
+    const float far = 10;
+    const float near = 0.1F;
+    const float fov = 45;
+    glm::mat4 projection = glm::perspective(fov, m_aspect, near, far);
+
+    return projection * view * model * anim;
+}
+
+float CubeRenderer::getAngleFromTime() {
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto millis1 = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    auto millis2 = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() / 10000 * 10000;
+    auto currentMs = (millis1 - millis2) / 10000.0F;
+
+    return static_cast<float>(currentMs * glm::radians(360.0));  // base 15° per second
+}
+
+void CubeRenderer::rotate(const glm::vec3 &rotationVec) {
+}
+
+void CubeRenderer::setAspect(float aspect) {
+    m_aspect = aspect;
 }

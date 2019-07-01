@@ -18,8 +18,6 @@ public:
     void render();
 
 private:
-    glm::mat4x4 getMvpMatrix(float angle) const;
-private:
 
     const static glm::vec3 CLEAR_COLOR;
 
