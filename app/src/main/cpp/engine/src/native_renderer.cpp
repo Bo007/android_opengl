@@ -48,13 +48,19 @@ void NativeRenderer::render() {
 
 glm::mat4x4 NativeRenderer::getMvpMatrix(float angle) const {
     glm::mat4 anim =
-            glm::rotate(glm::mat4(1.0f), angle * 3.0f, glm::vec3(1, 0, 0)) *  // X axis
-            glm::rotate(glm::mat4(1.0f), angle * 2.0f, glm::vec3(0, 1, 0)) *  // Y axis
-            glm::rotate(glm::mat4(1.0f), angle * 4.0f, glm::vec3(0, 0, 1));   // Z axis
+            glm::rotate(glm::mat4(1.0F), angle * 3.0f, glm::vec3(1, 0, 0)) *  // X axis
+            glm::rotate(glm::mat4(1.0F), angle * 2.0f, glm::vec3(0, 1, 0)) *  // Y axis
+            glm::rotate(glm::mat4(1.0F), angle * 4.0f, glm::vec3(0, 0, 1));   // Z axis
 
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
-    glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
-    glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_screenWidth / m_screenHeight, 0.1f, 10.0f);
+    glm::mat4 model = glm::translate(glm::mat4(1.0F), glm::vec3(0.0, 0.0, -4.0));
+    glm::mat4 view = glm::lookAt(glm::vec3(0.0F, 2.0F, 0.0F),
+                                 glm::vec3(0.0F, 0.0F, -4.0F),
+                                 glm::vec3(0.0F, 1.0F, 0.0F));
+
+    const float far = 10;
+    const float near = 0.1F;
+    const float fov = 45;
+    glm::mat4 projection = glm::perspective(fov, 1.0F * m_screenWidth / m_screenHeight, near, far);
 
     glm::mat4 mvp = projection * view * model * anim;
 

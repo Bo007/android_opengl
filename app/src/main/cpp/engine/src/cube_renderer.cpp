@@ -6,50 +6,65 @@
 
 #include "engine/include/engine_utils.h"
 
-const std::vector<GLfloat> CubeRenderer::verticlesData =
+const std::vector<GLfloat> CubeRenderer::verticlesDatas[] =
         {
-                1.0F, 0.0F, 1.0F,
-                1.0F, 0.0F, 0.0F,
-                1.0F, 1.0F, 1.0F,
-                1.0F, 1.0F, 0.0F,
+                {
+                        1.0F, 0.0F, 1.0F,
+                        1.0F, 0.0F, 0.0F,
+                        1.0F, 1.0F, 1.0F,
+                        1.0F, 1.0F, 0.0F,
+                },
 
-                0.0F, 0.0F, 1.0F,
-                0.0F, 0.0F, 0.0F,
-                0.0F, 1.0F, 1.0F,
-                0.0F, 1.0F, 0.0F,
+                {
+                        0.0F, 0.0F, 1.0F,
+                        0.0F, 0.0F, 0.0F,
+                        0.0F, 1.0F, 1.0F,
+                        0.0F, 1.0F, 0.0F,
+                },
 
+                {
+                        1.0F, 0.0F, 0.0F,
+                        1.0F, 0.0F, 1.0F,
+                        0.0F, 0.0F, 0.0F,
+                        0.0F, 0.0F, 1.0F,
+                },
 
-                1.0F, 0.0F, 0.0F,
-                1.0F, 0.0F, 1.0F,
-                0.0F, 0.0F, 0.0F,
-                0.0F, 0.0F, 1.0F,
+                {
+                        1.0F, 1.0F, 0.0F,
+                        1.0F, 1.0F, 1.0F,
+                        0.0F, 1.0F, 0.0F,
+                        0.0F, 1.0F, 1.0F,
+                },
 
-                1.0F, 1.0F, 0.0F,
-                1.0F, 1.0F, 1.0F,
-                0.0F, 1.0F, 0.0F,
-                0.0F, 1.0F, 1.0F,
+                {
+                        0.0F, 1.0F, 0.0F,
+                        0.0F, 0.0F, 0.0F,
+                        1.0F, 1.0F, 0.0F,
+                        1.0F, 0.0F, 0.0F,
+                },
 
-
-                0.0F, 1.0F, 0.0F,
-                0.0F, 0.0F, 0.0F,
-                1.0F, 1.0F, 0.0F,
-                1.0F, 0.0F, 0.0F,
-
-                0.0F, 1.0F, 1.0F,
-                0.0F, 0.0F, 1.0F,
-                1.0F, 1.0F, 1.0F,
-                1.0F, 0.0F, 1.0F,
+                {
+                        0.0F, 1.0F, 1.0F,
+                        0.0F, 0.0F, 1.0F,
+                        1.0F, 1.0F, 1.0F,
+                        1.0F, 0.0F, 1.0F,
+                },
         };
 
+
+const glm::vec3 CubeRenderer::flatColors[] = {
+        glm::vec3(1, 0, 0),
+        glm::vec3(0, 1, 0),
+
+        glm::vec3(0, 0, 1),
+        glm::vec3(1, 1, 0),
+
+        glm::vec3(0, 1, 1),
+        glm::vec3(1, 1, 1)
+};
+
 const std::vector<GLushort> CubeRenderer::indices = {
-        0, 1, 2, 2, 1, 3,
-        4, 5, 6, 6, 5, 7,
-
-        8, 9, 10, 10, 9, 11,
-        12, 13, 14, 14, 13, 15,
-
-        16, 17, 18, 18, 17, 19,
-        20, 21, 22, 22, 21, 23,
+        0, 1, 2, 2, 1, 3
 };
 
 static const GLchar *VERTEX_SHADER = R"glsl(
@@ -57,14 +72,11 @@ precision mediump float;
 
 attribute vec3 aPosition;
 
-varying vec3 vColors;
-
 uniform mat4 uMvp;
 
 void main(void)
 {
     gl_Position = uMvp * vec4( aPosition, 1.0 );
-    vColors = aPosition;
 }
 
 )glsl";
@@ -72,11 +84,11 @@ void main(void)
 static const GLchar *FRAGMENT_SHADER = R"glsl(
 precision mediump float;
 
-varying vec3 vColors;
+uniform vec3 uColor;
 
 void main(void)
 {
-    gl_FragColor = vec4( vColors, 1.0 );
+    gl_FragColor = vec4( uColor, 1.0 );
 }
 
 )glsl";
@@ -89,6 +101,8 @@ CubeRenderer::CubeRenderer() {
 
     m_mvpHandle = glGetUniformLocation(m_programID, "uMvp");
 
+    m_colorHandle = glGetUniformLocation(m_programID, "uColor");
+
     m_mvpMatrix = glm::mat4x4(1);
 }
 
@@ -99,26 +113,35 @@ CubeRenderer::~CubeRenderer() {
 void CubeRenderer::render() {
     glUseProgram(m_programID);
 
-    if (m_posititonCoordinateHandle != -1) {
-
-        glVertexAttribPointer(m_posititonCoordinateHandle,
-                              3,
-                              GL_FLOAT,
-                              GL_FALSE,
-                              0,
-                              CubeRenderer::verticlesData.data());
-
-        glEnableVertexAttribArray(m_posititonCoordinateHandle);
+    if (-1 != m_mvpHandle) {
+        glUniformMatrix4fv(m_mvpHandle, 1, GL_FALSE, glm::value_ptr(m_mvpMatrix));
     }
 
-    glUniformMatrix4fv(m_mvpHandle, 1, GL_FALSE, glm::value_ptr(m_mvpMatrix));
+    for (int i = 0; i < 6; ++i) {
+        if (-1 != m_posititonCoordinateHandle) {
 
-    glDrawElements(GL_TRIANGLES, CubeRenderer::indices.size(), GL_UNSIGNED_SHORT, CubeRenderer::indices.data());
+            glVertexAttribPointer(m_posititonCoordinateHandle,
+                                  3,
+                                  GL_FLOAT,
+                                  GL_FALSE,
+                                  0,
+                                  CubeRenderer::verticlesDatas[i].data());
 
-    if (m_posititonCoordinateHandle != -1)
-        glDisableVertexAttribArray(m_posititonCoordinateHandle);
+            glEnableVertexAttribArray(m_posititonCoordinateHandle);
+        }
 
-    engine_utils::CheckGLError("GLSimpleRenderer::draw");
+        if (-1 != m_colorHandle) {
+            auto color = CubeRenderer::flatColors[i];
+            glUniform3fv(m_colorHandle, 1, glm::value_ptr(color));
+        }
+
+        glDrawElements(GL_TRIANGLES, CubeRenderer::indices.size(), GL_UNSIGNED_SHORT, CubeRenderer::indices.data());
+
+        if (m_posititonCoordinateHandle != -1)
+            glDisableVertexAttribArray(m_posititonCoordinateHandle);
+
+        engine_utils::CheckGLError("CubeRenderer::render");
+    }
 }
 
 void CubeRenderer::setMvpMatrix(const glm::mat4 &mvpMatrix) {

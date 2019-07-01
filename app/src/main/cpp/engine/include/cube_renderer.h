@@ -21,8 +21,10 @@ private:
 
     GLint m_posititonCoordinateHandle;
     GLint m_mvpHandle;
+    GLint m_colorHandle;
 
-    static const std::vector<GLfloat> verticlesData;
+    static const std::vector<GLfloat> verticlesDatas[];
+    static const glm::vec3 flatColors[];
     static const std::vector<GLushort> indices;
 
     glm::mat4 m_mvpMatrix;
