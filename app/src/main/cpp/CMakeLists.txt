@@ -4,13 +4,15 @@ add_library(
         native-lib
         SHARED
         native-lib.cpp
-        NativeRenderer.cpp)
+        engine/src/native_renderer.cpp
+)
 
 target_include_directories(
         native-lib
         PRIVATE
         thirdparty/include
-        jni_wrapper/include)
+        jni_wrapper/include
+        ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(
         native-lib

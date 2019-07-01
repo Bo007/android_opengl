@@ -1,4 +1,4 @@
-#include "NativeRenderer.h"
+#include "engine/include/native_renderer.h"
 
 #include <vector>
 #include <string>
@@ -11,6 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "logger.h"
+
+#include "engine/include/engine_utils.h"
 
 const std::vector<GLfloat> NativeRenderer::verticlesData =
         {
@@ -87,76 +89,8 @@ void main(void)
 
 )glsl";
 
-static bool BuildShader(std::string const &shader_source, GLuint &shader, GLenum type) {
-    int size = static_cast<int>(shader_source.length());
-
-    shader = glCreateShader(type);
-
-    if (shader == 0)
-        return false;
-
-    char const *c_shader_source = shader_source.c_str();
-    glShaderSource(shader, 1, &c_shader_source, &size);
-    glCompileShader(shader);
-    GLint status;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-    if (status != GL_TRUE) {
-        LOGI("failed to compile shader");
-        int length = 1024;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-        std::vector<char> log(static_cast<unsigned long>(length));
-        glGetShaderInfoLog(shader, length, &length, &log[0]);
-        LOGE("%s", &log[0]);
-        return false;
-    }
-
-    return true;
-}
-
-static bool BuildProgram(const std::string &vertShaderSource,
-                         const std::string &fragShaderSource,
-                         GLuint &programObject) {
-    GLuint vertexShaderId;
-    if (!BuildShader(vertShaderSource, vertexShaderId, GL_VERTEX_SHADER)) {
-        LOGE("failed to build vertex shader");
-        return false;
-    }
-    GLuint fragmentShaderId;
-    if (!BuildShader(fragShaderSource, fragmentShaderId, GL_FRAGMENT_SHADER)) {
-        LOGE("failed to build fragment shader");
-        return false;
-    }
-
-    programObject = glCreateProgram();
-    glAttachShader(programObject, vertexShaderId);
-    glAttachShader(programObject, fragmentShaderId);
-    glLinkProgram(programObject);
-    GLint status;
-    glGetProgramiv(programObject, GL_LINK_STATUS, &status);
-    if (status != GL_TRUE) {
-        LOGE("failed to link program");
-        int length;
-        glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &length);
-        std::vector<char> log(length);
-        glGetShaderInfoLog(programObject, length, &length, &log[0]);
-        LOGE("%s", &log[0]);
-        return false;
-    }
-
-    return true;
-}
-
-void CheckGLError(const char *label) {
-    int gl_error = glGetError();
-    if (gl_error != GL_NO_ERROR) {
-        LOGE("GL error @ %s: %d", label, gl_error);
-        // Crash immediately to make OpenGL errors obvious.
-        abort();
-    }
-}
-
 NativeRenderer::NativeRenderer() {
-    bool res = BuildProgram(VERTEX_SHADER, FRAGMENT_SHADER, m_programID);
+    bool res = engine_utils::BuildProgram(VERTEX_SHADER, FRAGMENT_SHADER, m_programID);
     assert(res);
     m_screenWidth = m_screenHeight = 0;
 
@@ -204,7 +138,7 @@ void NativeRenderer::render() {
     if (m_posititonCoordinateHandle != -1)
         glDisableVertexAttribArray(m_posititonCoordinateHandle);
 
-    CheckGLError("GLSimpleRenderer::draw");
+    engine_utils::CheckGLError("GLSimpleRenderer::draw");
 }
 
 glm::mat4x4 NativeRenderer::getMvpMatrix() const {

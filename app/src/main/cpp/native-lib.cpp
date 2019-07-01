@@ -7,7 +7,7 @@
 
 #include "jni_resource_reader.h"
 
-#include "NativeRenderer.h"
+#include "engine/include/native_renderer.h"
 
 extern "C"
 {
