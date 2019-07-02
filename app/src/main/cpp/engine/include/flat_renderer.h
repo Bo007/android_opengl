@@ -8,7 +8,7 @@
 
 class FlatRenderer {
 public:
-    FlatRenderer();
+    FlatRenderer(float minCubeSize, float maxCubeSize);
 
     ~FlatRenderer();
 
@@ -29,11 +29,6 @@ private:
     static constexpr int FACE_NUMBERS = 6;
     static constexpr float FACE_KOEF = 0.9F;
 
-
-    static constexpr float MAX_VERTEX_VALUE = 0.5F;
-    static constexpr float MIN_VERTEX_VALUE = -0.5F;
-
-    static const std::vector<GLfloat> VERTEX_DATA;
     static const std::array<GLushort, 6> VERTEX_INDICES;
 
     std::array<glm::vec3, FACE_NUMBERS * 4> m_vertex;

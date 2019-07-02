@@ -20,13 +20,17 @@ public:
     void setAspect(float aspect);
 
 private:
-    glm::mat4 getMvpMatrix(float angle) const;
-
     static float getAngleFromTime();
 
 private:
+
+    static const float CUBE_HALF_SIZE;
+
     std::unique_ptr<FlatRenderer> m_flatRenderer;
 
-    float m_aspect;
+    std::array<glm::vec3, 27> m_translateVecs;
+
+    glm::mat4 m_projectionMatrix;
+    glm::mat4 m_viewMatrix;
 };
 
