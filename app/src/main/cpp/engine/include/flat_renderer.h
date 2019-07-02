@@ -14,7 +14,7 @@ public:
 
     void render();
 
-    void setMvpMatrix(const glm::mat4 &mvpMatrix);
+    void setMvpMatrix(const glm::mat4 &mvpMatrix, const glm::vec3 &translateVec);
 
 private:
 
@@ -32,6 +32,7 @@ private:
     static const std::array<GLushort, 6> VERTEX_INDICES;
 
     std::array<glm::vec3, FACE_NUMBERS * 4> m_vertex;
+    std::array<glm::vec4, FACE_NUMBERS * 4> m_rotatedVertex;
 
     std::array<glm::vec3, FACE_NUMBERS> m_facesColors;
 };

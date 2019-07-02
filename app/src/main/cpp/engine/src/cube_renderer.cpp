@@ -16,17 +16,14 @@ CubeRenderer::CubeRenderer() {
 
     auto defaultTranslateVec = glm::vec3(0.0, 0.0, -4.0F);
 
+    float cubeSize = 2 * CubeRenderer::CUBE_HALF_SIZE;
     m_translateVecs = {};
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-
             for (int k = 0; k < 3; ++k) {
-                m_translateVecs[i * 9 + j * 3 + k].x =
-                        defaultTranslateVec.x + 2 * CubeRenderer::CUBE_HALF_SIZE * (i - 1);
-                m_translateVecs[i * 9 + j * 3 + k].y =
-                        defaultTranslateVec.y + 2 * CubeRenderer::CUBE_HALF_SIZE * (j - 1);
-                m_translateVecs[i * 9 + j * 3 + k].z =
-                        defaultTranslateVec.z + 2 * CubeRenderer::CUBE_HALF_SIZE * (k - 1);
+                m_translateVecs[i * 9 + j * 3 + k].x = cubeSize * (i - 1);
+                m_translateVecs[i * 9 + j * 3 + k].y = cubeSize * (j - 1);
+                m_translateVecs[i * 9 + j * 3 + k].z = cubeSize * (k - 1);
             }
         }
     }
@@ -43,16 +40,16 @@ CubeRenderer::~CubeRenderer() {
 }
 
 void CubeRenderer::render() {
-//    float angle = getAngleFromTime();
-    auto angle = static_cast<float>(M_PI / 180 * 0);
+    float angle = getAngleFromTime();
+//    auto angle = glm::radians(0.0f);
 
+    auto defaultTranslateVec = glm::vec3(0.0, 0.0, -4.0F);
     for (auto &translateVec: m_translateVecs) {
+        glm::vec3 axisY = glm::vec3(0, 1, 0);
+        auto anim = glm::rotate(glm::mat4(1.0F), angle, axisY);
 
-        glm::vec3 rotationAxis = glm::vec3(0, 1, 0);
-        glm::mat4 anim = glm::rotate(glm::mat4(1.0F), angle, rotationAxis);
-
-        auto mvp = glm::translate(m_projectionMatrix * m_viewMatrix, translateVec) * anim;
-        m_flatRenderer->setMvpMatrix(mvp);
+        auto mvp = glm::translate(m_projectionMatrix * m_viewMatrix, defaultTranslateVec) * anim;
+        m_flatRenderer->setMvpMatrix(mvp, translateVec);
         m_flatRenderer->render();
     }
 }
