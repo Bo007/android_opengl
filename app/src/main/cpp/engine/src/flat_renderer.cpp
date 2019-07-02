@@ -14,13 +14,13 @@ const std::array<GLushort, 6> FlatRenderer::VERTEX_INDICES = {
 static const GLchar *VERTEX_SHADER = R"glsl(
 precision mediump float;
 
-attribute vec3 aPosition;
+attribute vec4 aPosition;
 
-uniform mat4 uMvp;
+//uniform mat4 uMvp;
 
 void main(void)
 {
-    gl_Position = uMvp * vec4( aPosition, 1.0 );
+    gl_Position = vec4( aPosition );
 }
 
 )glsl";
@@ -83,7 +83,6 @@ FlatRenderer::FlatRenderer(float minCubeSize, float maxCubeSize) {
         std::swap(m_vertex[i + secondShift].z, m_vertex[i + secondShift].y);
     }
 
-
     m_facesColors = {glm::vec3(1, 0, 0),
                      glm::vec3(0, 1, 0),
                      glm::vec3(0, 0, 1),
@@ -108,11 +107,11 @@ void FlatRenderer::render() {
         if (-1 != m_posititonCoordinateHandle) {
 
             glVertexAttribPointer(m_posititonCoordinateHandle,
-                                  3,
+                                  4,
                                   GL_FLOAT,
                                   GL_FALSE,
                                   0,
-                                  m_vertex.data() + i * 4);
+                                  m_rotatedVertex.data() + i * 4);
 
             glEnableVertexAttribArray(m_posititonCoordinateHandle);
         }
@@ -132,6 +131,16 @@ void FlatRenderer::render() {
     engine_utils::CheckGLError("CubeRenderer::render");
 }
 
-void FlatRenderer::setMvpMatrix(const glm::mat4 &mvpMatrix) {
+void FlatRenderer::setMvpMatrix(const glm::mat4 &mvpMatrix, const glm::vec3 &translateVec) {
     m_mvpMatrix = mvpMatrix;
+
+    for (int i = 0; i < m_rotatedVertex.size(); ++i) {
+        glm::vec4 movedVertex;
+        movedVertex.x = m_vertex[i].x + translateVec.x;
+        movedVertex.y = m_vertex[i].y + translateVec.y;
+        movedVertex.z = m_vertex[i].z + translateVec.z;
+        movedVertex.w = 1;
+
+        m_rotatedVertex[i] = mvpMatrix * movedVertex;
+    }
 }
