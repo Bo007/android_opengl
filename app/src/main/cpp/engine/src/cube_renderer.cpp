@@ -25,7 +25,8 @@ void CubeRenderer::render() {
 }
 
 glm::mat4 CubeRenderer::getMvpMatrix(float angle) const {
-    glm::mat4 anim = glm::rotate(glm::mat4(1.0F), angle, glm::vec3(1, 1, 1));
+    glm::vec3 rotationAxis = glm::vec3(0, 1, 0);
+    glm::mat4 anim = glm::rotate(glm::mat4(1.0F), angle, rotationAxis);
 
     glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0F, 0.0), glm::vec3(0.0, 0.0, -4.0F), glm::vec3(0.0, 1.0, 0.0));
 
