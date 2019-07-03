@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdarg>
 
-#define LOG_TAG "MyFirstGame"
+#define LOG_TAG "RubikCube"
 
 #ifdef ANDROID
 

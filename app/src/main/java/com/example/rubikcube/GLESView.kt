@@ -1,4 +1,4 @@
-package com.example.myfirstgame
+package com.example.rubikcube
 
 import android.content.Context
 import android.opengl.GLSurfaceView

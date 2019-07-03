@@ -1,4 +1,4 @@
-package com.example.myfirstgame
+package com.example.rubikcube
 
 import android.app.Activity
 import android.content.res.AssetManager

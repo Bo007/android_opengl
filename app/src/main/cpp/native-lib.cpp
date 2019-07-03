@@ -16,7 +16,7 @@ extern "C"
 
 #define MAIN_ACTIVITY_METHOD(Type, funcName) \
 JNIEXPORT Type JNICALL \
-Java_com_example_myfirstgame_MainActivity_##funcName
+Java_com_example_rubikcube_MainActivity_##funcName
 
 MAIN_ACTIVITY_METHOD(void, initAssetManager)
 (JNIEnv *env, jobject,
@@ -33,7 +33,7 @@ MAIN_ACTIVITY_METHOD(void, initAssetManager)
 std::unique_ptr<NativeRenderer> g_renderer;
 #define NATIVE_RENDERER_METHOD(Type, funcName) \
 JNIEXPORT Type JNICALL \
-Java_com_example_myfirstgame_NativeRenderer_##funcName
+Java_com_example_rubikcube_NativeRenderer_##funcName
 
 NATIVE_RENDERER_METHOD(void, init)
 (JNIEnv *, jobject) {

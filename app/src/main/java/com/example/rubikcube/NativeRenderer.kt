@@ -1,4 +1,4 @@
-package com.example.myfirstgame
+package com.example.rubikcube
 
 
 // Wrapper for native library
