@@ -28,7 +28,7 @@ private:
 
 private:
 
-    static const float CUBE_HALF_SIZE;
+    static const float CUBE_SIZE;
 
     std::unique_ptr<FlatRenderer> m_flatRenderer;
 

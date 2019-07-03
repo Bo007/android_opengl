@@ -9,26 +9,24 @@
 
 #include "logger.h"
 
-constexpr float CubeRenderer::CUBE_HALF_SIZE = 0.5F / 3;
+constexpr float CubeRenderer::CUBE_SIZE = 0.33F;
 
 CubeRenderer::CubeRenderer() {
-    m_flatRenderer = std::make_unique<FlatRenderer>(-CUBE_HALF_SIZE, CUBE_HALF_SIZE);
+    m_flatRenderer = std::make_unique<FlatRenderer>(-0.5 * CUBE_SIZE, 0.5 * CUBE_SIZE);
 
-    auto defaultTranslateVec = glm::vec3(0.0, 0.0, -4.0F);
-
-    float cubeSize = 2 * CubeRenderer::CUBE_HALF_SIZE;
     m_translateVecs = {};
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 3; ++k) {
                 int index = i * 9 + j * 3 + k;
-                m_translateVecs[index] = glm::vec3(i - 1, j - 1, k - 1) * cubeSize;
+                m_translateVecs[index] = glm::vec3(i - 1, j - 1, k - 1) * CubeRenderer::CUBE_SIZE;
                 m_rotationMatrices[index] = glm::mat4(1);
             }
         }
     }
 
     auto defaultRotationVec = glm::vec3(0.0, 2.0F, 0.0);
+    auto defaultTranslateVec = glm::vec3(0.0, 0.0, -4.0F);
     auto rotationDirectionVec = glm::vec3(0.0, 1.0F, 0.0);
     m_viewMatrix = glm::lookAt(defaultRotationVec, defaultTranslateVec, rotationDirectionVec);
 
