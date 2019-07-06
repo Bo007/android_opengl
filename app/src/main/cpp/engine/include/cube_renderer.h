@@ -26,7 +26,9 @@ private:
 
     void calculateMvpMatrix();
 
-    void rebuildFacesIndeces();
+    void buildFacesIndeces();
+
+    void rebuildFaceIndeces(int index);
 
 private:
 
@@ -35,13 +37,15 @@ private:
     std::unique_ptr<FlatRenderer> m_flatRenderer;
 
     std::array<glm::vec3, 27> m_translateVecs;
-    std::array<glm::mat4, 27> m_rotationMatrices;
 
+    std::array<int, 20> m_rotatedVerticles;
     struct CubeFace {
         glm::vec3 m_rotationAxis;
-        std::array<int, 9> m_indices;
+        std::array<int *, 8> m_indices;
     };
     std::array<CubeFace, 6> m_cubeFace;
+
+    std::array<glm::mat4, 27> m_rotationMatrices;
 
 
     glm::mat4 m_projectionMatrix;

@@ -43,19 +43,13 @@ CubeRenderer::CubeRenderer() {
     m_cubeFace[2].m_rotationAxis = glm::vec3(0, 0, 1);
     m_cubeFace[3].m_rotationAxis = glm::vec3(0, 0, -1);
 
-    rebuildFacesIndeces();
-}
+    buildFacesIndeces();
 
-CubeRenderer::~CubeRenderer() {
-    m_flatRenderer.reset();
-}
-
-void CubeRenderer::render() {
     // Rotate cube faces
-    auto angle = glm::radians(90.0f);
+    auto angle = glm::radians(90.0F);
 ////  rotate left / right
     rotateCubeFace(0, angle);
-//    rotateCubeFace(5, angle);
+    rotateCubeFace(5, angle);
 
 //// rotate bottom / top
 //    rotateCubeFace(1, angle);
@@ -64,12 +58,18 @@ void CubeRenderer::render() {
 //// rotate back / front
 //    rotateCubeFace(2, angle);
 //    rotateCubeFace(3, angle);
+}
 
+CubeRenderer::~CubeRenderer() {
+    m_flatRenderer.reset();
+}
+
+void CubeRenderer::render() {
 // Rotate cube
-//    angle = getAngleFromTime();
-//    auto rotationVec = glm::vec3(0, 1, 0) * angle;
-//    rotateCube(rotationVec);
-
+//    auto angle = glm::radians(270.0F);
+    auto angle = getAngleFromTime();
+    auto rotationVec = glm::vec3(0, 1, 0) * angle;
+    rotateCube(rotationVec);
 
     for (int i = 0; i < m_translateVecs.size(); ++i) {
         m_flatRenderer->setMvpMatrix(m_mvpMatrix * m_rotationMatrices[i], m_translateVecs[i]);
@@ -81,7 +81,7 @@ void CubeRenderer::rotateCube(const glm::vec3 &rotationVec) {
     float angle = glm::length(rotationVec);
     glm::vec3 axis = glm::normalize(rotationVec);
 
-    m_rotationMatrix = glm::mat4(1.0F);
+    m_rotationMatrix = glm::mat4(1);
     if (static_cast<bool>(angle)) {
         m_rotationMatrix = glm::rotate(m_rotationMatrix, angle, axis);
     }
@@ -92,12 +92,13 @@ void CubeRenderer::rotateCube(const glm::vec3 &rotationVec) {
 void CubeRenderer::rotateCubeFace(int faceIndex, float angle) {
     auto *cubeFace = &m_cubeFace[faceIndex];
     for (int i = 0; i < cubeFace->m_indices.size(); ++i) {
-        int index = cubeFace->m_indices[i];
-        m_rotationMatrices[index] = glm::mat4(1.0F);
+        int index = *cubeFace->m_indices[i];
+        LOGI("rotateCubeFace index %d", index);
         if (static_cast<bool>(angle)) {
             m_rotationMatrices[index] = glm::rotate(m_rotationMatrices[index], angle, cubeFace->m_rotationAxis);
         }
     }
+    rebuildFaceIndeces(faceIndex);
 }
 
 void CubeRenderer::setAspect(float aspect) {
@@ -123,21 +124,87 @@ void CubeRenderer::calculateMvpMatrix() {
     m_mvpMatrix = glm::translate(m_projectionMatrix * m_viewMatrix, defaultTranslateVec) * m_rotationMatrix;
 }
 
-void CubeRenderer::rebuildFacesIndeces() {
-    const int rows = 3;
-    const int cols = 3;
-    constexpr int matrixSize = rows * cols;
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            int index = i * 3 + j;
-            m_cubeFace[0].m_indices[index] = index;
-            m_cubeFace[5].m_indices[index] = m_cubeFace[0].m_indices[index] + 2 * matrixSize;
+void CubeRenderer::buildFacesIndeces() {
 
-            m_cubeFace[1].m_indices[index] = m_cubeFace[0].m_indices[j] + i * matrixSize;
-            m_cubeFace[4].m_indices[index] = m_cubeFace[1].m_indices[index] + 6;
+    for (int i = 0; i < 4; ++i) {
+        m_rotatedVerticles[i] = i;
+        m_rotatedVerticles[4 + i] = 5 + i;
 
-            m_cubeFace[2].m_indices[index] = m_cubeFace[0].m_indices[j * 3 + i] + i * matrixSize;
-            m_cubeFace[3].m_indices[index] = m_cubeFace[2].m_indices[index] + 2;
-        }
+        m_rotatedVerticles[8 + i] = 2 * i + 9;
+
+        m_rotatedVerticles[12 + i] = i + 18;
+        m_rotatedVerticles[16 + i] = i + 23;
     }
+
+    m_rotatedVerticles[8] = 9;
+    m_rotatedVerticles[9] = 11;
+    m_rotatedVerticles[10] = 15;
+    m_rotatedVerticles[11] = 17;
+
+    // left / right
+    int indexesSize = 8;
+    for (int i = 0; i < indexesSize; ++i) {
+        m_cubeFace[0].m_indices[i] = &m_rotatedVerticles[i];
+        m_cubeFace[5].m_indices[i] = &m_rotatedVerticles[i + 12];
+    }
+
+    // bottom
+    m_cubeFace[1].m_indices[0] = &m_rotatedVerticles[0];
+    m_cubeFace[1].m_indices[1] = &m_rotatedVerticles[1];
+    m_cubeFace[1].m_indices[2] = &m_rotatedVerticles[2];
+
+    m_cubeFace[1].m_indices[3] = &m_rotatedVerticles[8];
+    m_cubeFace[1].m_indices[4] = &m_rotatedVerticles[9];
+
+    m_cubeFace[1].m_indices[5] = &m_rotatedVerticles[12];
+    m_cubeFace[1].m_indices[6] = &m_rotatedVerticles[13];
+    m_cubeFace[1].m_indices[7] = &m_rotatedVerticles[14];
+    // top
+    m_cubeFace[4].m_indices[0] = &m_rotatedVerticles[5];
+    m_cubeFace[4].m_indices[1] = &m_rotatedVerticles[6];
+    m_cubeFace[4].m_indices[2] = &m_rotatedVerticles[7];
+
+    m_cubeFace[4].m_indices[3] = &m_rotatedVerticles[10];
+    m_cubeFace[4].m_indices[4] = &m_rotatedVerticles[11];
+
+    m_cubeFace[4].m_indices[5] = &m_rotatedVerticles[17];
+    m_cubeFace[4].m_indices[6] = &m_rotatedVerticles[18];
+    m_cubeFace[4].m_indices[7] = &m_rotatedVerticles[19];
+
+    // back
+    m_cubeFace[2].m_indices[0] = &m_rotatedVerticles[0];
+    m_cubeFace[2].m_indices[1] = &m_rotatedVerticles[3];
+    m_cubeFace[2].m_indices[2] = &m_rotatedVerticles[5];
+
+    m_cubeFace[2].m_indices[3] = &m_rotatedVerticles[8];
+    m_cubeFace[2].m_indices[4] = &m_rotatedVerticles[10];
+
+    m_cubeFace[2].m_indices[5] = &m_rotatedVerticles[12];
+    m_cubeFace[2].m_indices[6] = &m_rotatedVerticles[15];
+    m_cubeFace[2].m_indices[7] = &m_rotatedVerticles[17];
+
+    // front
+    m_cubeFace[3].m_indices[0] = &m_rotatedVerticles[2];
+    m_cubeFace[3].m_indices[1] = &m_rotatedVerticles[4];
+    m_cubeFace[3].m_indices[2] = &m_rotatedVerticles[7];
+
+    m_cubeFace[3].m_indices[3] = &m_rotatedVerticles[9];
+    m_cubeFace[3].m_indices[4] = &m_rotatedVerticles[11];
+
+    m_cubeFace[3].m_indices[5] = &m_rotatedVerticles[14];
+    m_cubeFace[3].m_indices[6] = &m_rotatedVerticles[16];
+    m_cubeFace[3].m_indices[7] = &m_rotatedVerticles[19];
+}
+
+void CubeRenderer::rebuildFaceIndeces(int index) {
+    auto &faceIndeces = m_cubeFace[index].m_indices;
+
+    int temp1 = *faceIndeces[6];
+    int temp2 = *faceIndeces[7];
+    for (int i = 2; i >= 0; --i) {
+        *faceIndeces[i * 2] = *faceIndeces[2 * (i + 1)];
+        *faceIndeces[i * 2 + 1] = *faceIndeces[2 * (i + 1) + 1];
+    }
+    *faceIndeces[0] = temp1;
+    *faceIndeces[1] = temp2;
 }
