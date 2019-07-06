@@ -49,10 +49,10 @@ CubeRenderer::CubeRenderer() {
     auto angle = glm::radians(90.0F);
 ////  rotate left / right
     rotateCubeFace(0, angle);
-    rotateCubeFace(5, angle);
+//    rotateCubeFace(5, angle);
 
 //// rotate bottom / top
-//    rotateCubeFace(1, angle);
+    rotateCubeFace(1, angle);
 //    rotateCubeFace(4, angle);
 
 //// rotate back / front
@@ -93,9 +93,10 @@ void CubeRenderer::rotateCubeFace(int faceIndex, float angle) {
     auto *cubeFace = &m_cubeFace[faceIndex];
     for (int i = 0; i < cubeFace->m_indices.size(); ++i) {
         int index = *cubeFace->m_indices[i];
-        LOGI("rotateCubeFace index %d", index);
+//        m_rotationMatrices[index] = glm::mat4(1);
         if (static_cast<bool>(angle)) {
-            m_rotationMatrices[index] = glm::rotate(m_rotationMatrices[index], angle, cubeFace->m_rotationAxis);
+            m_rotationMatrices[index] =
+                    glm::rotate(glm::mat4(1), angle, cubeFace->m_rotationAxis) * m_rotationMatrices[index];
         }
     }
     rebuildFaceIndeces(faceIndex);
@@ -197,14 +198,39 @@ void CubeRenderer::buildFacesIndeces() {
 }
 
 void CubeRenderer::rebuildFaceIndeces(int index) {
-    auto &faceIndeces = m_cubeFace[index].m_indices;
+    auto &faceIndices = m_cubeFace[index].m_indices;
 
-    int temp1 = *faceIndeces[6];
-    int temp2 = *faceIndeces[7];
-    for (int i = 2; i >= 0; --i) {
-        *faceIndeces[i * 2] = *faceIndeces[2 * (i + 1)];
-        *faceIndeces[i * 2 + 1] = *faceIndeces[2 * (i + 1) + 1];
+    for (auto item: faceIndices) {
+        LOGI("before rotation faceIndices = %d", *item);
     }
-    *faceIndeces[0] = temp1;
-    *faceIndeces[1] = temp2;
+
+    // rotate left
+    int temp = *faceIndices[0];
+    *faceIndices[0] = *faceIndices[2];
+    *faceIndices[2] = *faceIndices[7];
+    *faceIndices[7] = *faceIndices[5];
+    *faceIndices[5] = temp;
+
+    temp = *faceIndices[1];
+    *faceIndices[1] = *faceIndices[4];
+    *faceIndices[4] = *faceIndices[6];
+    *faceIndices[6] = *faceIndices[3];
+    *faceIndices[3] = temp;
+
+    // rotate right
+//    int temp = *faceIndices[0];
+//    *faceIndices[0] = *faceIndices[5];
+//    *faceIndices[5] = *faceIndices[7];
+//    *faceIndices[7] = *faceIndices[2];
+//    *faceIndices[2] = temp;
+//
+//    temp = *faceIndices[1];
+//    *faceIndices[1] = *faceIndices[3];
+//    *faceIndices[3] = *faceIndices[6];
+//    *faceIndices[6] = *faceIndices[4];
+//    *faceIndices[4] = temp;
+
+    for (auto item: faceIndices) {
+        LOGI("after rotation faceIndices = %d", *item);
+    }
 }
