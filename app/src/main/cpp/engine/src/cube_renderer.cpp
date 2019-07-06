@@ -43,11 +43,7 @@ CubeRenderer::CubeRenderer() {
     m_cubeFace[2].m_rotationAxis = glm::vec3(0, 0, 1);
     m_cubeFace[3].m_rotationAxis = glm::vec3(0, 0, -1);
 
-    int indecesSize = m_cubeFace[0].m_indices.size();
-    for (int i = 0; i < indecesSize; ++i) {
-        m_cubeFace[0].m_indices[i] = i;
-        m_cubeFace[5].m_indices[i] = 26 - i;
-    }
+    rebuildFacesIndeces();
 }
 
 CubeRenderer::~CubeRenderer() {
@@ -55,13 +51,24 @@ CubeRenderer::~CubeRenderer() {
 }
 
 void CubeRenderer::render() {
-    auto angle = glm::radians(15.0f);
+    // Rotate cube faces
+    auto angle = glm::radians(90.0f);
+////  rotate left / right
     rotateCubeFace(0, angle);
-    rotateCubeFace(5, angle);
+//    rotateCubeFace(5, angle);
 
-    angle = getAngleFromTime();
-    auto rotationVec = glm::vec3(0, 1, 0) * angle;
-    rotateCube(rotationVec);
+//// rotate bottom / top
+//    rotateCubeFace(1, angle);
+//    rotateCubeFace(4, angle);
+
+//// rotate back / front
+//    rotateCubeFace(2, angle);
+//    rotateCubeFace(3, angle);
+
+// Rotate cube
+//    angle = getAngleFromTime();
+//    auto rotationVec = glm::vec3(0, 1, 0) * angle;
+//    rotateCube(rotationVec);
 
 
     for (int i = 0; i < m_translateVecs.size(); ++i) {
@@ -114,4 +121,23 @@ float CubeRenderer::getAngleFromTime() {
 void CubeRenderer::calculateMvpMatrix() {
     auto defaultTranslateVec = glm::vec3(0.0, 0.0, -4.0F);
     m_mvpMatrix = glm::translate(m_projectionMatrix * m_viewMatrix, defaultTranslateVec) * m_rotationMatrix;
+}
+
+void CubeRenderer::rebuildFacesIndeces() {
+    const int rows = 3;
+    const int cols = 3;
+    constexpr int matrixSize = rows * cols;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            int index = i * 3 + j;
+            m_cubeFace[0].m_indices[index] = index;
+            m_cubeFace[5].m_indices[index] = m_cubeFace[0].m_indices[index] + 2 * matrixSize;
+
+            m_cubeFace[1].m_indices[index] = m_cubeFace[0].m_indices[j] + i * matrixSize;
+            m_cubeFace[4].m_indices[index] = m_cubeFace[1].m_indices[index] + 6;
+
+            m_cubeFace[2].m_indices[index] = m_cubeFace[0].m_indices[j * 3 + i] + i * matrixSize;
+            m_cubeFace[3].m_indices[index] = m_cubeFace[2].m_indices[index] + 2;
+        }
+    }
 }

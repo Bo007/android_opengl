@@ -26,6 +26,8 @@ private:
 
     void calculateMvpMatrix();
 
+    void rebuildFacesIndeces();
+
 private:
 
     static const float CUBE_SIZE;
