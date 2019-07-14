@@ -3,6 +3,11 @@ package com.example.rubikcube
 import android.app.Activity
 import android.content.res.AssetManager
 import android.os.Bundle
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.FILL_PARENT
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.widget.RelativeLayout
+import kotlinx.android.synthetic.main.activity_main.view.*
 
 class MainActivity : Activity() {
     init {
@@ -15,7 +20,8 @@ class MainActivity : Activity() {
         super.onCreate(icicle)
         initAssetManager(getAssets())
         mView = GLESView(application)
-        setContentView(mView)
+        setContentView(R.layout.activity_main)
+        addContentView(mView, RelativeLayout.LayoutParams(300, 300))
     }
 
     override fun onPause() {
