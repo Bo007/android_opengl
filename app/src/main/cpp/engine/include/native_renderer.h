@@ -17,6 +17,8 @@ public:
 
     void render();
 
+    void rotateFace(int faceId);
+
 private:
 
     const static glm::vec3 CLEAR_COLOR;

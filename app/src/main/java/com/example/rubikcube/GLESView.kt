@@ -28,4 +28,6 @@ internal class GLESView(context: Context) : GLSurfaceView(context) {
             NativeRenderer.init()
         }
     }
+
+    fun rotateFace(faceId: Int) = NativeRenderer.rotateFace(faceId)
 }

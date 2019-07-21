@@ -51,4 +51,10 @@ NATIVE_RENDERER_METHOD(void, render)
     g_renderer->render();
 }
 
+NATIVE_RENDERER_METHOD(void, rotateFace)
+(JNIEnv *, jobject,
+ jint faceId) {
+    g_renderer->rotateFace(faceId);
+}
+
 }

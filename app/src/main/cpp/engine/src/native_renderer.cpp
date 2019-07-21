@@ -41,3 +41,8 @@ void NativeRenderer::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_cubeRenderer->render();
 }
+
+void NativeRenderer::rotateFace(int faceId) {
+    auto angle = glm::radians(90.0F);
+    m_cubeRenderer->rotateCubeFace(faceId, angle);
+}

@@ -46,13 +46,13 @@ CubeRenderer::CubeRenderer() {
     buildFacesIndeces();
 
     // Rotate cube faces
-    auto angle = glm::radians(90.0F);
+//    auto angle = glm::radians(90.0F);
 ////  rotate left / right
-    rotateCubeFace(0, angle);
+//    rotateCubeFace(0, angle);
 //    rotateCubeFace(5, angle);
 
 //// rotate bottom / top
-    rotateCubeFace(1, angle);
+//    rotateCubeFace(1, angle);
 //    rotateCubeFace(4, angle);
 
 //// rotate back / front
@@ -93,7 +93,6 @@ void CubeRenderer::rotateCubeFace(int faceIndex, float angle) {
     auto *cubeFace = &m_cubeFace[faceIndex];
     for (int i = 0; i < cubeFace->m_indices.size(); ++i) {
         int index = *cubeFace->m_indices[i];
-//        m_rotationMatrices[index] = glm::mat4(1);
         if (static_cast<bool>(angle)) {
             m_rotationMatrices[index] =
                     glm::rotate(glm::mat4(1), angle, cubeFace->m_rotationAxis) * m_rotationMatrices[index];

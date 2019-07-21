@@ -15,26 +15,26 @@
         <Button
                 android:text="Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/button15"/>
+                android:layout_height="wrap_content" android:id="@+id/clickButton1"/>
         <Button
                 android:text="Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/button16"/>
+                android:layout_height="wrap_content" android:id="@+id/clickButton2"/>
         <Button
                 android:text="Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/button17"/>
+                android:layout_height="wrap_content" android:id="@+id/clickButton3"/>
         <Button
                 android:text="Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/button18"/>
+                android:layout_height="wrap_content" android:id="@+id/clickButton4"/>
         <Button
                 android:text="Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/button19"/>
+                android:layout_height="wrap_content" android:id="@+id/clickButton5"/>
         <Button
                 android:text="Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/button20"/>
+                android:layout_height="wrap_content" android:id="@+id/clickButton6"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
